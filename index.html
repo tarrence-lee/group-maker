@@ -213,7 +213,6 @@
     color: var(--text);
     font-size: 15px;
   }
-  .name-row input:focus { outline: none; }
   .name-row .del {
     flex: 0 0 44px;
     width: 44px;
@@ -355,12 +354,6 @@
 
   function defaultName(i) { return '참가자 ' + (i + 1); }
 
-  // 현재 input 값들을 names 상태로 동기화
-  function syncFromInputs() {
-    const inputs = nameGrid.querySelectorAll('input');
-    names = Array.from(inputs).map(inp => inp.value);
-  }
-
   function renderNames() {
     nameGrid.innerHTML = '';
     names.forEach((name, i) => {
@@ -383,10 +376,12 @@
       del.textContent = '✕';
       del.setAttribute('aria-label', (i + 1) + '번째 참가자 삭제');
       del.addEventListener('click', () => {
-        syncFromInputs();
         names.splice(i, 1);
         if (names.length === 0) names.push('');
         renderNames();
+        const rows = nameGrid.querySelectorAll('.name-row');
+        const focusRow = rows[Math.min(i, rows.length - 1)];
+        (focusRow && focusRow.querySelector('.del'))?.focus();
       });
 
       row.appendChild(idx);
@@ -437,7 +432,6 @@
   }
 
   function run() {
-    syncFromInputs();
     // 빈 칸은 기본 이름으로 보정
     const roster = names.map((nm, i) => (nm && nm.trim()) ? nm.trim() : defaultName(i));
 

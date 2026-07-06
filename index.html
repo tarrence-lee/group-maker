@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>오징어골프 그룹나누기</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#4f46e5">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<style>
+  :root {
+    --accent: #4f46e5;
+    --accent2: #9333ea;
+    --surface: #ffffff;
+    --soft: #f1f5f9;
+    --softer: #f8fafc;
+    --glass-border: #e5e7eb;
+    --text: #1e293b;
+    --muted: #475569;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', 'Pretendard', 'Malgun Gothic', sans-serif;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    background:
+      radial-gradient(900px 500px at 8% -10%, #e0e7ff 0%, transparent 55%),
+      radial-gradient(800px 450px at 110% 0%, #f3e8ff 0%, transparent 50%),
+      linear-gradient(160deg, #f8fafc, #ffffff);
+    background-attachment: fixed;
+    overflow: hidden;
+  }
+  button, input { font-family: inherit; }
+  button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 18px 50px rgba(2,6,23,0.08);
+  }
+  @media (min-width: 601px) {
+    body { overflow: auto; padding: 24px 16px; }
+    .app {
+      height: min(760px, 92vh);
+      border-radius: 24px;
+      border: 1px solid var(--glass-border);
+      margin: auto 0;
+    }
+  }
+
+  .app-header {
+    padding: 12px 16px 6px;
+    flex: 0 0 auto;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+  .subtitle { color: var(--muted); font-size: 11.5px; margin: 0; }
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  button {
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .1s, box-shadow .25s, opacity .2s, background .2s;
+  }
+  button:active { transform: translateY(1px) scale(.99); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(79,70,229,0.35);
+  }
+  .btn-primary:hover:not(:disabled) { box-shadow: 0 10px 30px rgba(147,51,234,0.45); }
+  .btn-ghost {
+    background: var(--soft);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+  }
+  .btn-ghost:hover:not(:disabled) { background: #e2e8f0; }
+  .btn-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .tabs {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 4px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .tab {
+    flex: 1;
+    min-height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab[aria-selected="true"] {
+    color: var(--accent);
+    background: rgba(79,70,229,0.08);
+    border-bottom: 2px solid var(--accent);
+  }
+  .tab-count { font-weight: 700; }
+
+  .panel-area { flex: 1; min-height: 0; position: relative; }
+  .panel {
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px 16px 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .panel[hidden] { display: none; }
+
+  .paste-box {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--softer);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 8px;
+    margin: 0 16px 4px;
+  }
+  .paste-label { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+  .paste-row { display: flex; gap: 8px; align-items: center; }
+  .paste-textarea {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  .paste-apply {
+    flex: 0 0 auto;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+  .paste-status { font-size: 12px; color: var(--muted); min-height: 14px; }
+
+  .name-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--softer);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 2px 2px 2px 10px;
+  }
+  .name-row .idx { font-size: 12px; color: var(--muted); width: 22px; flex: 0 0 auto; text-align: right; }
+  .name-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 15px;
+  }
+  .name-row input:focus { outline: none; }
+  .name-row .del {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    font-size: 17px;
+    border-radius: 8px;
+  }
+  .name-row .del:hover { color: #dc2626; background: rgba(220,38,38,0.1); }
+
+  .bottom-bar {
+    flex: 0 0 auto;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--glass-border);
+    background: var(--surface);
+  }
+  .big-run {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+
+  .summary { text-align: center; color: var(--muted); font-size: 13px; margin: 2px 0 14px; min-height: 18px; }
+  .summary b { color: var(--accent); }
+
+  .groups {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .group-card {
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 14px;
+    background: var(--softer);
+    animation: pop .35s ease both;
+  }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+  .group-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .group-name { font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .group-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.4); flex: none; }
+  .group-count {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    background: var(--soft); padding: 3px 9px; border-radius: 999px;
+  }
+  .member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .member {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 9px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .empty { text-align: center; color: var(--muted); padding: 24px 12px; font-size: 14px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .group-card { animation: none; }
+    button { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="title-row">
+        <h1>⛳ 오징어골프 그룹나누기</h1>
+        <button type="button" class="btn-ghost btn-icon" id="resetAll" aria-label="다시하기 (전체 초기화)">
+          <span aria-hidden="true">🔄</span><span class="btn-text">다시하기</span>
+        </button>
+      </div>
+      <p class="subtitle">명단을 무작위로 섞은 뒤 3~4명 단위로 조를 나눕니다.</p>
+    </header>
+
+    <div class="paste-box">
+      <label for="pasteNames" class="paste-label sr-only">참가자 명단</label>
+      <div class="paste-row">
+        <input type="text" id="pasteNames" class="paste-textarea" placeholder="예) 철수 영희 민수  또는  가나다라마">
+        <button type="button" class="btn-ghost paste-apply" id="pasteApplyBtn">적용</button>
+      </div>
+      <div id="pasteStatus" class="paste-status" role="status" aria-live="polite"></div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="화면 전환">
+      <button type="button" class="tab" id="tabNamesBtn" role="tab" aria-selected="true" aria-controls="namesPanel">
+        참가자 명단 (<span class="tab-count" id="nameHint">8</span>)
+      </button>
+      <button type="button" class="tab" id="tabGroupsBtn" role="tab" aria-selected="false" aria-controls="groupsPanel">
+        결과
+      </button>
+    </div>
+
+    <div class="panel-area">
+      <div class="panel" id="namesPanel" role="tabpanel" aria-labelledby="tabNamesBtn">
+        <div class="name-list" id="nameGrid"></div>
+      </div>
+      <div class="panel" id="groupsPanel" role="tabpanel" aria-labelledby="tabGroupsBtn" hidden>
+        <div class="summary" id="summary" role="status" aria-live="polite"></div>
+        <div class="groups" id="groups">
+          <div class="empty">아직 그룹이 없습니다. 아래 버튼을 눌러 나눠보세요.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button type="button" class="btn-primary big-run" id="run">🔀 무작위로 그룹 나누기</button>
+    </div>
+  </div>
+
+<script>
+  const nameGrid      = document.getElementById('nameGrid');
+  const nameHint      = document.getElementById('nameHint');
+  const groupsEl       = document.getElementById('groups');
+  const summaryEl      = document.getElementById('summary');
+  const tabNamesBtn   = document.getElementById('tabNamesBtn');
+  const tabGroupsBtn  = document.getElementById('tabGroupsBtn');
+  const namesPanel    = document.getElementById('namesPanel');
+  const groupsPanel   = document.getElementById('groupsPanel');
+  const pasteNamesEl  = document.getElementById('pasteNames');
+  const pasteApplyBtn = document.getElementById('pasteApplyBtn');
+  const pasteStatusEl = document.getElementById('pasteStatus');
+  const resetAllBtn   = document.getElementById('resetAll');
+
+  const GROUP_COLORS = ['#f87171','#34d399','#60a5fa','#fbbf24','#c084fc',
+                        '#22d3ee','#f472b6','#a3e635','#fb923c','#818cf8',
+                        '#2dd4bf','#e879f9'];
+
+  let names = [];   // 참가자 이름 상태 배열
+
+  function defaultName(i) { return '참가자 ' + (i + 1); }
+
+  // 현재 input 값들을 names 상태로 동기화
+  function syncFromInputs() {
+    const inputs = nameGrid.querySelectorAll('input');
+    names = Array.from(inputs).map(inp => inp.value);
+  }
+
+  function renderNames() {
+    nameGrid.innerHTML = '';
+    names.forEach((name, i) => {
+      const row = document.createElement('div');
+      row.className = 'name-row';
+
+      const idx = document.createElement('span');
+      idx.className = 'idx';
+      idx.textContent = (i + 1);
+
+      const inp = document.createElement('input');
+      inp.value = name;
+      inp.placeholder = defaultName(i);
+      inp.setAttribute('aria-label', (i + 1) + '번째 참가자 이름');
+      inp.addEventListener('input', () => { names[i] = inp.value; });
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.textContent = '✕';
+      del.setAttribute('aria-label', (i + 1) + '번째 참가자 삭제');
+      del.addEventListener('click', () => {
+        syncFromInputs();
+        names.splice(i, 1);
+        if (names.length === 0) names.push('');
+        renderNames();
+      });
+
+      row.appendChild(idx);
+      row.appendChild(inp);
+      row.appendChild(del);
+      nameGrid.appendChild(row);
+    });
+    nameHint.textContent = names.length;
+  }
+
+  function generateFromCount(n) {
+    if (!Number.isFinite(n) || n < 1) n = 1;
+    if (n > 100) n = 100;
+    names = Array.from({ length: n }, () => '');
+    renderNames();
+  }
+
+  // ── 그룹 크기 계산 ──────────────────────────────
+  // 그룹 수 = ceil(N/4), 인원을 그룹 수에 균등 분배 → 자연스럽게 3~4명 단위
+  function computeGroupSizes(n) {
+    if (n <= 0) return [];
+    if (n === 5) return [5];
+    const g = Math.ceil(n / 4);
+    const base = Math.floor(n / g);
+    const rem = n % g;            // rem개 그룹은 (base+1)명, 나머지는 base명
+    const sizes = [];
+    for (let i = 0; i < g; i++) sizes.push(base + (i < rem ? 1 : 0));
+    sizes.sort((a, b) => a - b);  // 작은 그룹부터 표시 (예: 5명 → 2+3)
+    return sizes;
+  }
+
+  // Fisher–Yates 셔플
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function setActiveTab(tab) {
+    const isNames = tab === 'names';
+    namesPanel.hidden = !isNames;
+    groupsPanel.hidden = isNames;
+    tabNamesBtn.setAttribute('aria-selected', String(isNames));
+    tabGroupsBtn.setAttribute('aria-selected', String(!isNames));
+  }
+
+  function run() {
+    syncFromInputs();
+    // 빈 칸은 기본 이름으로 보정
+    const roster = names.map((nm, i) => (nm && nm.trim()) ? nm.trim() : defaultName(i));
+
+    if (roster.length === 0) {
+      groupsEl.innerHTML = '<div class="empty">참가자를 먼저 입력하세요.</div>';
+      summaryEl.textContent = '';
+      setActiveTab('groups');
+      return;
+    }
+
+    const shuffled = shuffle(roster);          // 1) 무작위 셔플
+    const sizes = computeGroupSizes(shuffled.length); // 2) 그룹 크기 산출
+
+    // 3) 순서대로 잘라서 그룹 구성
+    const groups = [];
+    let pos = 0;
+    for (const s of sizes) {
+      groups.push(shuffled.slice(pos, pos + s));
+      pos += s;
+    }
+
+    renderGroups(groups);
+    summaryEl.innerHTML =
+      `총 <b>${roster.length}명</b> → <b>${groups.length}개 조</b> ` +
+      `(구성: ${sizes.join(' + ')})`;
+    setActiveTab('groups');
+  }
+
+  function renderGroups(groups) {
+    groupsEl.innerHTML = '';
+    groups.forEach((members, gi) => {
+      const color = GROUP_COLORS[gi % GROUP_COLORS.length];
+      const card = document.createElement('div');
+      card.className = 'group-card';
+      card.style.animationDelay = (gi * 0.06) + 's';
+      card.style.borderColor = color + '55';
+
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML =
+        `<span class="group-name"><span class="group-dot" aria-hidden="true" style="background:${color}"></span>${gi + 1}조</span>` +
+        `<span class="group-count">${members.length}명</span>`;
+
+      const ul = document.createElement('ul');
+      ul.className = 'member-list';
+      members.forEach(m => {
+        const li = document.createElement('li');
+        li.className = 'member';
+        li.textContent = m;
+        li.style.borderLeft = `3px solid ${color}`;
+        ul.appendChild(li);
+      });
+
+      card.appendChild(head);
+      card.appendChild(ul);
+      groupsEl.appendChild(card);
+    });
+  }
+
+  // 이벤트 연결
+  pasteApplyBtn.addEventListener('click', () => {
+    const text = pasteNamesEl.value.trim();
+    if (!text) return; // 빈 입력은 무시
+
+    const tokens = text.split(/\s+/).filter(t => t.length > 0);
+    let parsed;
+    let mode;
+    if (tokens.length >= 2) {
+      parsed = tokens; // 공백 구분 이름 모드
+      mode = 'word';
+    } else {
+      parsed = Array.from(text); // 글자 단위 모드 (유니코드 안전)
+      mode = 'char';
+    }
+
+    if (parsed.length === 0) return;
+
+    let truncated = false;
+    if (parsed.length > 100) {
+      parsed = parsed.slice(0, 100);
+      truncated = true;
+    }
+
+    names = parsed;
+    renderNames();
+
+    let statusMsg = mode === 'word'
+      ? `이름 ${parsed.length}명으로 인식했습니다`
+      : `글자 단위로 ${parsed.length}명 인식했습니다`;
+    if (truncated) statusMsg += ' (100명 초과로 100명까지만 반영됨)';
+    pasteStatusEl.textContent = statusMsg;
+  });
+  resetAllBtn.addEventListener('click', () => {
+    pasteNamesEl.value = '';
+    pasteStatusEl.textContent = '';
+    generateFromCount(8);
+    groupsEl.innerHTML = '<div class="empty">아직 그룹이 없습니다. 아래 버튼을 눌러 나눠보세요.</div>';
+    summaryEl.textContent = '';
+    setActiveTab('names');
+  });
+  document.getElementById('run').addEventListener('click', run);
+  tabNamesBtn.addEventListener('click', () => setActiveTab('names'));
+  tabGroupsBtn.addEventListener('click', () => setActiveTab('groups'));
+
+  // 초기 명단 생성
+  generateFromCount(8);
+
+  // PWA: 서비스 워커 등록 (오프라인 지원)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js');
+    });
+  }
+</script>
+</body>
+</html>

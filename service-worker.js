@@ -1,5 +1,5 @@
 // 오징어골프 그룹나누기 - 오프라인 앱 셸 캐싱 (cache-first)
-const CACHE_NAME = 'squid-golf-group-maker-v2';
+const CACHE_NAME = 'squid-golf-group-maker-v3';
 const APP_SHELL = [
   './',
   './index.html',

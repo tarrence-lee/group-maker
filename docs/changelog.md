@@ -29,3 +29,10 @@ QA 재검증에서 발견된 항목 중 아래 2건을 프론트엔드 재설계
 - GitHub 공개 저장소 `tarrence-lee/group-maker` 생성 및 최초 커밋 푸시.
 - GitHub Pages 배포 활성화 (`master` 브랜치, 루트 경로) → https://tarrence-lee.github.io/group-maker/
 - `docs/` 폴더에 프로젝트 문서화(개요/사용법/배포/변경 이력) 추가.
+
+## v5 — Vercel로 호스팅 이전
+- `vercel.json` 추가: `service-worker.js`/`manifest.json`은 `no-cache`, 아이콘은 1년 캐시(`immutable`)로 헤더 지정.
+- GitHub 저장소를 Vercel에 연동해 `master` push 시 자동 배포되도록 설정 → https://group-maker-five.vercel.app/
+- 배포 파일이 로컬 소스와 바이트 단위로 동일함을 확인, 서비스워커 등록(`activated`) 및 조 편성 기능 정상 동작 확인.
+- 기존 GitHub Pages 비활성화 (`DELETE /repos/tarrence-lee/group-maker/pages`), `tarrence-lee.github.io/group-maker/`는 404.
+- README/docs의 라이브 주소를 Vercel 주소로 갱신.

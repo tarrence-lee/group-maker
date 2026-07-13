@@ -6,7 +6,7 @@
 PWA(Progressive Web App)로 구성되어 있습니다.
 
 ## 배포 주소
-- 라이브 앱: https://tarrence-lee.github.io/group-maker/
+- 라이브 앱: https://group-maker-five.vercel.app/
 - 저장소: https://github.com/tarrence-lee/group-maker
 
 ## 핵심 기능
@@ -27,7 +27,7 @@ PWA(Progressive Web App)로 구성되어 있습니다.
 - 순수 HTML/CSS/바닐라 JavaScript, 빌드 도구·프레임워크·백엔드 없음
 - API 키나 외부 네트워크 호출 없음 (전부 클라이언트 로컬 동작)
 - WCAG 2.1 AA 접근성 기준(키보드 조작, 색상 대비, ARIA 라벨, 44×44px 터치 타겟) 준수
-- GitHub Pages로 정적 호스팅
+- Vercel로 정적 호스팅 (GitHub 연동, push 시 자동 배포)
 
 ## 관련 문서
 - [사용법](./usage.md)

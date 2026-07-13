@@ -28,7 +28,7 @@
 기본 상태(참가자 8명, 빈 이름)로 되돌아갑니다.
 
 ## 5. 휴대폰 앱처럼 설치하기
-1. 모바일 브라우저(Chrome/Safari 등)로 라이브 주소(https://tarrence-lee.github.io/group-maker/)를 엽니다.
+1. 모바일 브라우저(Chrome/Safari 등)로 라이브 주소(https://group-maker-five.vercel.app/)를 엽니다.
 2. 브라우저 메뉴에서 "홈 화면에 추가"(Android: 자동으로 설치 안내가 뜨기도 함, iOS Safari: 공유 버튼 →
    "홈 화면에 추가")를 선택합니다.
 3. 홈 화면에 생긴 아이콘으로 실행하면 브라우저 주소창 없이 전체화면 앱처럼 열립니다.
